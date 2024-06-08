@@ -1,0 +1,42 @@
+[package]
+name = "sshrpc"
+version = "0.1.0"
+edition = "2021"
+
+authors = ["Yuki Yamaura <ymruki@gmail.com>"]
+license = "MIT"
+description = "RPC through ssh port forwarding"
+homepage = "https://github.com/yamaura/sshrpc"
+repository = "https://github.com/yamaura/sshrpc"
+readme = "README.md"
+keywords = []
+categories = []
+include = ["src/**/*.rs", "README.md", "LICENSE"]
+
+[package.metadata.release]
+push = false
+tag-name = "{{prefix}}{{version}}"
+pre-release-commit-message = "Bump version to {{version}}"
+tag-message = "{{tag_name}}"
+
+[package.metadata.docs.rs]
+all-features = true
+
+[dependencies]
+anyhow = "1"
+async-trait = "0.1.80"
+futures = "0.3"
+futures-util = "0.3.30"
+russh = "0.43.0"
+strum = { version = "0.26.2", features = ["derive"] }
+serde = { version = "1.0.203", features = ["derive"] }
+tarpc = { version = "0.34", features = ["tokio1", "serde-transport", "tcp", "serde-transport-bincode"] }
+thiserror = "1"
+tokio = { version = "1.0" }
+tokio-util = { version = "0.7.11", features = ["codec"] }
+tracing = "0.1.40"
+
+[dev-dependencies]
+russh-keys = "0.43.0"
+tokio = { version = "1.0", features = ["rt-multi-thread", "macros", "fs"] }
+env_logger = "0.11.3"
