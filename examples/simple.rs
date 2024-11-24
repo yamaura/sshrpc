@@ -30,7 +30,7 @@ pub struct HelloServer;
 impl World for HelloServer {
     async fn hello(self, _: context::Context, name: String) -> Result<String, Error> {
         eprintln!(" INFO(server): called hello({})", name);
-        Ok(format!("Hello, {}!", name))
+        Ok(format!("Hello, {} from {}!", name, hostname::get().map(|x| x.to_string_lossy().to_string()).unwrap_or_default()))
     }
 }
 
