@@ -175,7 +175,7 @@ where
         debug!("which elfexec on remote");
         let has_elfexec = self.output(b"which elfexec").await?.code.sucess();
 
-        let mut channel = if has_elfexec {
+        let channel = if has_elfexec {
             debug!("elfexec is available. using it");
             let mut command = b"elfexec ".to_vec();
             command.extend_from_slice(&args.into());
@@ -240,6 +240,15 @@ where
 
             channel
         };
+
+        self.read_handshake_information(channel).await
+    }
+
+    async fn read_handshake_information(
+        &self,
+        channel: Channel<Msg>,
+    ) -> Result<SshRpcSession<Channel<Msg>, ChannelStream<Msg>>, Self::Error> {
+        let mut channel = channel;
 
         let handshake_information: HandshakeInformation = loop {
             let Some(msg) = channel.wait().await else {

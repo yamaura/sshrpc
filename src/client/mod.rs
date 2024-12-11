@@ -1,4 +1,4 @@
-mod russh;
+pub mod russh;
 
 use crate::transport::stream2transport;
 use crate::HandshakeInformation;
@@ -17,8 +17,8 @@ where
     pub stream: S,
 }
 
-#[derive(Debug, thiserror::Error)]
-pub enum AppProtcolError {
+#[derive(Debug, Clone, thiserror::Error)]
+pub enum AppProtocolError {
     #[error("App protocol version mismatch: expected {expected}, got {got}")]
     VersionMismatch { expected: u32, got: u32 },
 }
@@ -40,7 +40,7 @@ where
                 tarpc::tokio_serde::formats::Bincode<Item, SinkItem>,
             >,
         ),
-        AppProtcolError,
+        AppProtocolError,
     >
     where
         Item: for<'de> Deserialize<'de>,
@@ -48,7 +48,8 @@ where
     {
         // impl Stream<Item = Result<Item, std::io::Error>> + Sink<SinkItem>
         if self.handshake_information.app_protocol_version != app_protocol_version {
-            return Err(AppProtcolError::VersionMismatch {
+            return Err(
+                AppProtocolError::VersionMismatch {
                 expected: app_protocol_version,
                 got: self.handshake_information.app_protocol_version,
             });
@@ -84,4 +85,10 @@ where
     where
         R: tokio::io::AsyncRead + Unpin,
         A: Into<Vec<u8>>;
+
+    /// Read handshake information from channel and return SshRpcSession from it.
+    async fn read_handshake_information(
+        &self,
+        channel: C,
+    ) -> Result<SshRpcSession<C, S>, Self::Error>;
 }
